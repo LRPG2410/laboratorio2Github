@@ -9,7 +9,7 @@ package com.mycompany.laboratorio2;
  * @author lrpor
  */
 public class ventanaLogin extends javax.swing.JFrame {
-    
+    private int intentosFallidos = 0;
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(ventanaLogin.class.getName());
 
     /**
@@ -17,6 +17,7 @@ public class ventanaLogin extends javax.swing.JFrame {
      */
     public ventanaLogin() {
         initComponents();
+        this.setLocationRelativeTo(null);
     }
 
     /**
@@ -43,11 +44,27 @@ public class ventanaLogin extends javax.swing.JFrame {
 
         jLabel3.setText("Password:");
 
-        txtUser.setText("jTextField1");
+        txtUser.setText("Enter user");
+        txtUser.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                txtUserFocusGained(evt);
+            }
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                txtUserFocusLost(evt);
+            }
+        });
 
-        txtPass.setText("jPasswordField1");
+        txtPass.setText("Enter password");
+        txtPass.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                txtPassFocusGained(evt);
+            }
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                txtPassFocusLost(evt);
+            }
+        });
 
-        btnLogin.setText("jButton1");
+        btnLogin.setText("LOGIN");
         btnLogin.addActionListener(this::btnLoginActionPerformed);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -55,22 +72,22 @@ public class ventanaLogin extends javax.swing.JFrame {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(btnLogin)
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(layout.createSequentialGroup()
-                            .addGap(207, 207, 207)
-                            .addComponent(jLabel1))
-                        .addGroup(layout.createSequentialGroup()
-                            .addContainerGap()
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(jLabel3)
-                                .addComponent(jLabel2))
-                            .addGap(18, 18, 18)
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                .addComponent(txtUser)
-                                .addComponent(txtPass, javax.swing.GroupLayout.DEFAULT_SIZE, 180, Short.MAX_VALUE)))))
-                .addContainerGap(227, Short.MAX_VALUE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel3)
+                            .addComponent(jLabel2))
+                        .addGap(18, 18, 18)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(txtUser)
+                            .addComponent(txtPass, javax.swing.GroupLayout.DEFAULT_SIZE, 180, Short.MAX_VALUE))
+                        .addGap(18, 18, 18)
+                        .addComponent(btnLogin))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(128, 128, 128)
+                        .addComponent(jLabel1)))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -78,16 +95,17 @@ public class ventanaLogin extends javax.swing.JFrame {
                 .addContainerGap()
                 .addComponent(jLabel1)
                 .addGap(27, 27, 27)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel2)
-                    .addComponent(txtUser, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel3)
-                    .addComponent(txtPass, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
-                .addComponent(btnLogin)
-                .addContainerGap(172, Short.MAX_VALUE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(btnLogin, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel2)
+                            .addComponent(txtUser, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel3)
+                            .addComponent(txtPass, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         pack();
@@ -97,17 +115,77 @@ public class ventanaLogin extends javax.swing.JFrame {
         String user = txtUser.getText();
         String pass = new String(txtPass.getPassword());
         
+        //Validamos que no intente ingresar con los placeholders
+        if(user.equals("Enter user") || pass.equals("Enter password") || pass.isEmpty()){
+            javax.swing.JOptionPane.showMessageDialog(this, "Por favor, ingresa tu usuario y contraseña.", "Campos vacíos", javax.swing.JOptionPane.WARNING_MESSAGE);
+            return; //Termina la ejecución para que no sume intentos fallidos
+        }
+        
         if (user.equals("Inge")&&pass.equals("1986")){
+            intentosFallidos = 0; //Se reinicia el contador si entra con exito
             javax.swing.JOptionPane.showMessageDialog(this, "Acceso concedido!!!");
             
             ventanaMenuPrincipal menuP = new ventanaMenuPrincipal();
-            this.dispose();
-            menuP.setVisible(true);
+            this.dispose(); //Cierra la ventana de login
+            menuP.setVisible(true); //Abre el menú principal
             
         }else{
-            javax.swing.JOptionPane.showMessageDialog(this, "Usuario o contraseña incorrectos. Intenta de nuevo.","Error de autenticación",javax.swing.JOptionPane.ERROR_MESSAGE);
+            intentosFallidos++; //Sumamos un intento fallido
+            
+            if(intentosFallidos >=3){
+                javax.swing.JOptionPane.showMessageDialog(this, 
+                "Has superado los 3 intentos permitidos. El sistema se ha bloqueado.", 
+                "Acceso Bloqueado", 
+                javax.swing.JOptionPane.ERROR_MESSAGE);
+                
+                //Bloquea el botón y las cajas de texto para que no sigan intentando
+                btnLogin.setEnabled(false);
+                txtUser.setEnabled(false);
+                txtPass.setEnabled(false);
+            }else{
+                javax.swing.JOptionPane.showMessageDialog(this, 
+                "Usuario o contraseña incorrectos. Intento " + intentosFallidos + " de 3.", 
+                "Error de autenticación", 
+                javax.swing.JOptionPane.WARNING_MESSAGE);
+            }
         }
     }//GEN-LAST:event_btnLoginActionPerformed
+
+    private void txtUserFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtUserFocusGained
+        // TODO add your handling code here:
+        if (txtUser.getText().equals("Enter user")){
+            txtUser.setText("");
+            txtUser.setForeground(java.awt.Color.BLACK);
+        }
+    }//GEN-LAST:event_txtUserFocusGained
+
+    private void txtUserFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtUserFocusLost
+        // TODO add your handling code here:
+        if (txtUser.getText().isEmpty()){
+            txtUser.setText("Enter user");
+            txtUser.setForeground(new java.awt.Color(153,153,153));
+        }
+    }//GEN-LAST:event_txtUserFocusLost
+
+    private void txtPassFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtPassFocusGained
+        // TODO add your handling code here:
+        String pass = new String(txtPass.getPassword());
+        if(pass.equals("Enter password")){
+            txtPass.setText("");
+            txtPass.setForeground(java.awt.Color.BLACK);
+            txtPass.setEchoChar('*');
+        }
+    }//GEN-LAST:event_txtPassFocusGained
+
+    private void txtPassFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtPassFocusLost
+        // TODO add your handling code here:
+        String pass = new String(txtPass.getPassword());
+        if(pass.isEmpty()){
+            txtPass.setText("Enter password");
+            txtPass.setForeground(new java.awt.Color(153,153,153));
+            txtPass.setEchoChar((char)0);
+        }
+    }//GEN-LAST:event_txtPassFocusLost
 
     /**
      * @param args the command line arguments
